@@ -118,10 +118,12 @@ Do not store the real bot `.env` in Git.
 
 Instead:
 
-1. Keep a real `.env` file in a secure path on the target host, for example:
+1. Start from the bundled template:
+   `secrets/wafbot.env.example`
+2. Keep a real `.env` file in a secure path on the target host, for example:
    `/root/secrets/wafbot.env`
-2. Set `BOT_ENV_FILE=/root/secrets/wafbot.env` in `stack.env`
-3. Let `install-stack.sh` copy it into `/opt/wafbot/.env`
+3. Set `BOT_ENV_FILE=/root/secrets/wafbot.env` in `stack.env`
+4. Let `install-stack.sh` copy it into `/opt/wafbot/.env`
 
 That gives you one-shot deployment without exposing `BOT_TOKEN`, admin IDs, or chat IDs in Git history.
 
@@ -133,6 +135,7 @@ That gives you one-shot deployment without exposing `BOT_TOKEN`, admin IDs, or c
 
 ```bash
 mkdir -p /root/secrets
+cp secrets/wafbot.env.example /root/secrets/wafbot.env
 vi /root/secrets/wafbot.env
 chmod 600 /root/secrets/wafbot.env
 ```

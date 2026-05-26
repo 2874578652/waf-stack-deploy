@@ -1,0 +1,11 @@
+Host github-waf
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/waf_deploy_key
+  IdentitiesOnly yes
+
+Host github-bot
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/bot_deploy_key
+  IdentitiesOnly yes

@@ -1,0 +1,5 @@
+x-original-url
+x-rewrite-url
+x-http-method-override
+x-method-override
+x-forwarded-method

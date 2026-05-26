@@ -1,0 +1,8 @@
+/actuator
+/cgi-bin/
+/jmx-console
+/manager/html
+/solr/admin
+/wp-admin/
+/wp-login.php
+/xmlrpc.php

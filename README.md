@@ -7,6 +7,13 @@ This directory is a deployment orchestrator for your full WAF stack:
 
 It is designed for rebuilding a new server with one controlled install flow instead of manually copying files from the old machine.
 
+It supports two deployment modes:
+
+1. Repository mode
+   Pull `waf` and `bot` from their own repositories.
+2. Bundle mode
+   Ship exact copies of `waf` and `bot` inside this repository and deploy from one repo only.
+
 ## Goal
 
 On a new server, the final operator flow should be:
@@ -28,6 +35,9 @@ sudo bash install-stack.sh
 
 ```text
 waf-stack-deploy/
+├── bundles/
+│   ├── bot/
+│   └── waf/
 ├── install-stack.sh
 ├── stack.env.example
 ├── docs/
@@ -43,6 +53,7 @@ waf-stack-deploy/
 
 - Installs system packages needed by the WAF and bot
 - Clones or updates the `waf` and `bot` repositories
+- Or deploys from `bundles/waf` and `bundles/bot` if you choose bundle mode
 - Installs or updates OWASP CRS into the path expected by your WAF config
 - Syncs WAF repo files into `/etc/nginx` and `/etc/nginx/modsec`
 - Installs the bot into `/opt/wafbot`
@@ -62,6 +73,31 @@ Keep three repositories:
    Holds only deployment orchestration and machine bootstrap logic.
 
 This separation keeps runtime secrets out of Git while still letting you rebuild a machine quickly.
+
+## Fastest Practical One-Command Model
+
+If you want the deployment side to feel truly "one click", use bundle mode.
+This repository is now prepared for that path by default.
+
+1. Keep `waf` and `bot` as source repositories for normal development.
+2. Before a release, copy the exact deployable contents into:
+   - `bundles/waf/`
+   - `bundles/bot/`
+3. Keep `USE_LOCAL_BUNDLES=1` in `stack.env`
+
+Then a new server only needs:
+
+```bash
+git clone <waf-stack-deploy repo>
+cd waf-stack-deploy
+sudo bash install-stack.sh
+```
+
+That reduces deployment-time complexity to:
+
+- one repository
+- one secret file for the bot
+- one install command
 
 ## Private Repository Deployment
 
@@ -114,10 +150,38 @@ vi stack.env
 sudo bash install-stack.sh
 ```
 
+## Bundle Mode On A New Server
+
+If this repository already contains `bundles/waf` and `bundles/bot`, you can avoid the extra repository clones.
+
+Default:
+
+```bash
+USE_LOCAL_BUNDLES=1
+```
+
+Then the deployment path becomes:
+
+```bash
+git clone <waf-stack-deploy repo>
+cd waf-stack-deploy
+cp stack.env.example stack.env
+vi stack.env   # usually only BOT_ENV_FILE or branch/path overrides
+sudo bash install-stack.sh
+```
+
+If you later update the source `waf` or `bot` repositories, refresh the bundled copies before pushing a new deployment release:
+
+```bash
+bash scripts/refresh-bundles.sh
+git add bundles README.md stack.env.example scripts/
+git commit -m "Refresh bundled waf and bot"
+git push
+```
+
 ## Notes
 
 - The WAF repo is still a config package, not a whole OS image.
 - `install-stack.sh` assumes a Debian/Ubuntu-like system for package install.
 - The WAF config expects CRS under `/etc/nginx/modsec/coreruleset-4.24.1` by default.
 - If your upstream `proxy_pass` targets or domains change, update the `waf` repo first.
-

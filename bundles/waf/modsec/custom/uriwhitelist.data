@@ -1,0 +1,10 @@
+# URI 白名单 — 匹配到的 URI 完全跳过 WAF 检测
+# 每行一个字符串，@pmFromFile 做包含匹配（大小写不敏感）
+
+/api/mjkj-web/coin/open/pushNewsData
+/nacos/v1/cs/configs
+/api/mjkj-bladex/coin/message/sendMessage
+/api/mjkj-bladex/coincoin/update
+/api/mjkj-bladex/coin/message/edit
+/api/mjkj-bladex/notice/saveOrUpdate
+/api/mjkj-web/coin/assets/withdrawal

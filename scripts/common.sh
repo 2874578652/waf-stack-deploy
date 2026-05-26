@@ -20,6 +20,9 @@ source "${STACK_ENV}"
 
 : "${WAF_REPO_BRANCH:=main}"
 : "${BOT_REPO_BRANCH:=main}"
+: "${USE_LOCAL_BUNDLES:=0}"
+: "${WAF_BUNDLE_DIR:=}"
+: "${BOT_BUNDLE_DIR:=}"
 : "${WAF_SRC_DIR:=/opt/src/waf}"
 : "${BOT_SRC_DIR:=/opt/src/wafbot}"
 : "${WAF_INSTALL_NGINX_DIR:=/etc/nginx}"
@@ -53,6 +56,27 @@ warn() {
 die() {
     printf '[ERROR] %s\n' "$*" >&2
     exit 1
+}
+
+resolve_bundle_dir() {
+    local bundle_type="$1"
+    local explicit_dir="$2"
+
+    if [[ -n "${explicit_dir}" ]]; then
+        printf '%s\n' "${explicit_dir}"
+    else
+        printf '%s\n' "${STACK_ROOT}/bundles/${bundle_type}"
+    fi
+}
+
+sync_bundle_to_src() {
+    local bundle_dir="$1"
+    local target_dir="$2"
+
+    [[ -d "${bundle_dir}" ]] || die "Bundle directory not found: ${bundle_dir}"
+    mkdir -p "${target_dir}"
+    rsync -a --delete "${bundle_dir}/" "${target_dir}/"
+    log "Synced bundle ${bundle_dir} -> ${target_dir}"
 }
 
 require_root() {
@@ -132,4 +156,3 @@ ensure_crs() {
         log "Initialized ${CRS_INSTALL_DIR}/crs-setup.conf from example."
     fi
 }
-

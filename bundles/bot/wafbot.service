@@ -1,0 +1,19 @@
+[Unit]
+Description=ModSecurity WAF Telegram Bot
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/wafbot
+EnvironmentFile=/opt/wafbot/.env
+ExecStart=/opt/wafbot/venv/bin/python3 /opt/wafbot/run.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=wafbot
+
+[Install]
+WantedBy=multi-user.target

@@ -7,7 +7,13 @@ source "${SCRIPT_DIR}/common.sh"
 
 require_root
 
-clone_or_update "${WAF_REPO_URL}" "${WAF_REPO_BRANCH}" "${WAF_SRC_DIR}"
+if [[ "${USE_LOCAL_BUNDLES}" == "1" ]]; then
+    WAF_BUNDLE_DIR="$(resolve_bundle_dir waf "${WAF_BUNDLE_DIR}")"
+    sync_bundle_to_src "${WAF_BUNDLE_DIR}" "${WAF_SRC_DIR}"
+else
+    clone_or_update "${WAF_REPO_URL}" "${WAF_REPO_BRANCH}" "${WAF_SRC_DIR}"
+fi
+
 ensure_crs
 
 if [[ -x "${WAF_SRC_DIR}/scripts/verify.sh" ]]; then
@@ -46,4 +52,3 @@ if [[ "${START_NGINX}" == "1" ]]; then
 fi
 
 log "WAF install step complete."
-

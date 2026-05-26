@@ -7,7 +7,12 @@ source "${SCRIPT_DIR}/common.sh"
 
 require_root
 
-clone_or_update "${BOT_REPO_URL}" "${BOT_REPO_BRANCH}" "${BOT_SRC_DIR}"
+if [[ "${USE_LOCAL_BUNDLES}" == "1" ]]; then
+    BOT_BUNDLE_DIR="$(resolve_bundle_dir bot "${BOT_BUNDLE_DIR}")"
+    sync_bundle_to_src "${BOT_BUNDLE_DIR}" "${BOT_SRC_DIR}"
+else
+    clone_or_update "${BOT_REPO_URL}" "${BOT_REPO_BRANCH}" "${BOT_SRC_DIR}"
+fi
 
 backup_path "${BOT_INSTALL_DIR}"
 backup_path "/etc/systemd/system/${BOT_SERVICE_NAME}.service"
@@ -32,4 +37,3 @@ if [[ "${BOT_AUTO_START}" == "1" && -f "${BOT_INSTALL_DIR}/.env" ]]; then
 fi
 
 log "Bot install step complete."
-
